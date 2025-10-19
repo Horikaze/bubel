@@ -73,7 +73,7 @@ WHERE \`KLIENT\`.\`id_konta\` = '${escape(String(userID))}';`;
     <>
       <button
         onClick={() => dialogRef!.current!.showModal()}
-        className="btn btn-primary"
+        className="btn btn-primary place-self-start"
       >
         <p>Aktulizuj dane konta</p>
       </button>

@@ -1,25 +1,23 @@
 "use client";
 
-import { addGameProducerAction, addLanguage } from "@/actions/addGameAction";
-import { uploadImagesAction } from "@/actions/uploadImages";
+import { addGameType } from "@/actions/addGameAction";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import toast from "react-hot-toast";
-import SqlView from "../_components/SqlView";
 import { FaSpinner } from "react-icons/fa6";
+import SqlView from "../_components/SqlView";
 
-type AddLanguageType = {
+type AddTypeType = {
   nazwa: string;
-  skrot: string;
-  images: string;
+  opis: string;
 };
 
-export default function AddLanguage() {
-  const [formData, setFormData] = useState<Partial<AddLanguageType> | null>(
-    null
-  );
+export default function AddType() {
+  const [formData, setFormData] = useState<Partial<AddTypeType> | null>(null);
   const [sqlQuery, setSqlQuery] = useState("");
   const [pending, setPending] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const router = useRouter();
   const handleChange = (e: React.ChangeEvent<any>) => {
     const { name, value } = e.target;
     const escape = (v: string) => v.replace(/'/g, "''");
@@ -27,8 +25,7 @@ export default function AddLanguage() {
       const updated = { ...prev, [name]: value };
       const fields: [string, string | null | undefined][] = [
         ["nazwa", updated.nazwa],
-        ["flaga", updated.images],
-        ["skrot", updated.skrot],
+        ["opis", updated.opis],
       ];
       const validFields = fields.filter(([_, v]) => (v ?? "").trim() !== "");
 
@@ -38,7 +35,7 @@ export default function AddLanguage() {
           .map(([_, v]) => `'${escape(String(v))}'`)
           .join(", ");
 
-        const query = `INSERT INTO \`JEZYK\` (${columns}) VALUES (${values});`;
+        const query = `INSERT INTO \`RODZAJ\` (${columns}) VALUES (${values});`;
         setSqlQuery(query);
       } else {
         setSqlQuery("");
@@ -55,21 +52,18 @@ export default function AddLanguage() {
       Object.entries(formData).forEach(([key, value]) =>
         data.append(key, value)
       );
-      const imagesData = new FormData(e.currentTarget);
-      const images = await uploadImagesAction(imagesData);
-
-      const res = await addLanguage({
+      const res = await addGameType({
         nazwa: formData.nazwa || "",
-        images: images[0] || "",
-        skrot: formData.skrot || "",
+        opis: formData.opis || "",
       });
       setPending(false);
-      toast.success("Dodano język");
+      toast.success("Dodano rodzaj gry");
       formRef.current?.reset();
+      router.refresh();
     } catch (error) {
       console.log(error);
       setPending(false);
-      toast.error("Błąd podczas dodawania języka");
+      toast.error("Błąd podczas dodawania rodzaju gry");
     }
   };
 
@@ -85,50 +79,36 @@ export default function AddLanguage() {
         onSubmit={handleSubmit}
         className="flex flex-col gap-2"
       >
-        <h2 className="font-semibold text-2xl">Dodaj Język</h2>
+        <h2 className="font-semibold text-2xl">Dodaj Rodzaj Gry</h2>
         <div className="flex items-center gap-2 mt-2">
-          <span className="w-40">Nazwa</span>
+          <span className="w-40">Rodzaj</span>
           <input
             required
             type="text"
             name="nazwa"
             maxLength={20}
-            placeholder="Nazwa"
+            placeholder="Rodzaj"
             onChange={handleChange}
             disabled={pending}
             className="input input-sm"
+          />
+        </div>
+        <div className="flex items-center gap-2 mt-2">
+          <span className="w-40">Opis</span>
+          <textarea
+            required
+            name="opis"
+            maxLength={20}
+            placeholder="Opis..."
+            onChange={handleChange}
+            disabled={pending}
+            className="textarea textarea-sm h-24 max-h-52"
           />
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="w-40">Flaga</span>
-          <input
-            required
-            type="file"
-            name="images"
-            accept="image/*"
-            placeholder="Flaga"
-            onChange={handleChange}
-            disabled={pending}
-            className="input input-sm"
-          />
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-40">Skrót</span>
-          <input
-            required
-            type="text"
-            name="skrot"
-            maxLength={5}
-            placeholder="Skrót"
-            onChange={handleChange}
-            disabled={pending}
-            className="input input-sm"
-          />
-        </div>
         <button className="btn btn-primary place-self-start" disabled={pending}>
           {pending && <FaSpinner className="animate-spin size-4" />}
-          Dodaj producenta
+          Dodaj Rodzaj
         </button>
       </form>
     </>

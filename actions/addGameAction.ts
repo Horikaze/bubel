@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db/drizzle";
-import { gra, jezyk, klient, producent } from "@/db/schema";
+import { gra, jezyk, klient, producent, rodzaj } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { log } from "console";
 import { eq, sql } from "drizzle-orm";
@@ -12,6 +12,7 @@ export const addGameAction = async (formData: FormData) => {
   const hdrs = await headers();
   const session = await auth.api.getSession({ headers: hdrs });
   if (!session) throw new Error("Nieautoryzowany");
+
   const nazwa = formData.get("nazwa") as string;
   const cena = formData.get("cena") as string;
   const id_producenta = Number(formData.get("id_producenta"));
@@ -21,7 +22,7 @@ export const addGameAction = async (formData: FormData) => {
   const id_rodzaj = Number(formData.get("id_rodzaj"));
   const opis = formData.get("opis") as string;
   const zdjecia = formData.get("zdjecia") as string;
-  const ocena = Number(formData.get("ocena"));
+  const ocena = formData.get("ocena") as string;
   const dostepnosc = Number(formData.get("dostepnosc"));
   if (
     !nazwa ||
@@ -38,6 +39,19 @@ export const addGameAction = async (formData: FormData) => {
   ) {
     throw new Error("Popraw swoje dane");
   }
+  await db.insert(gra).values({
+    nazwa,
+    cena,
+    id_producenta,
+    id_jezyk,
+    data_wydania: new Date(data_wydania),
+    id_rodzaj,
+    opis,
+    zdjecia,
+    ocena,
+    dostepnosc,
+    od_ilu_lat,
+  });
 };
 
 export type AddProducerType = {
@@ -84,7 +98,7 @@ export const addGameType = async (gameType: AddGameTypeType) => {
   const session = await auth.api.getSession({ headers: hdrs });
   if (!session) throw new Error("Nieautoryzowany");
   if (!gameType) throw new Error("Brak danych języku");
-  await db.insert(jezyk).values({
+  await db.insert(rodzaj).values({
     ...gameType,
   });
 };

@@ -3,10 +3,12 @@
 import { useRef, useState } from "react";
 import SqlView from "../_components/SqlView";
 import { addGameAction } from "@/actions/addGameAction";
-import { jezyk, producent } from "@/db/schema";
+import { jezyk, producent, rodzaj } from "@/db/schema";
 import toast from "react-hot-toast";
 import { FaInfo, FaSpinner } from "react-icons/fa6";
 import { FaInfoCircle } from "react-icons/fa";
+import { useRouter } from "next/navigation";
+import { uploadImagesAction } from "@/actions/uploadImages";
 
 type Gra = {
   nazwa: string | null;
@@ -23,22 +25,25 @@ type Gra = {
 };
 type Producers = typeof producent.$inferSelect;
 type Languages = typeof jezyk.$inferSelect;
+type GameTypes = typeof rodzaj.$inferSelect;
 type AddGameProps = {
   userId: string;
   producers: Producers[];
   languages: Languages[];
+  types: GameTypes[];
 };
 
 export default function AddGame({
   userId,
   producers,
   languages,
+  types,
 }: AddGameProps) {
   const [formData, setFormData] = useState<Partial<Gra>>({});
   const [sqlQuery, setSqlQuery] = useState("");
   const [pending, setPending] = useState(false);
-  const [message, setMessage] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
+  const router = useRouter();
   const handleChange = (e: React.ChangeEvent<any>) => {
     const { name, value } = e.target;
 
@@ -84,19 +89,22 @@ export default function AddGame({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     try {
       e.preventDefault();
-      setPending(true);
-
+      // setPending(true);
+      const imagesData = new FormData(e.currentTarget);
+      const images = await uploadImagesAction(imagesData);
       const data = new FormData();
       Object.entries(formData).forEach(([key, value]) =>
         data.append(key, value as string)
       );
+      data.append("zdjecia", images.join(","));
       await addGameAction(data);
       toast.success("Dodano producenta");
-      formRef.current?.reset();
+      // formRef.current?.reset();
+      // router.refresh();
       setPending(false);
     } catch (error) {
+      toast.error((error as Error).message);
       setPending(false);
-      setMessage("Wystąpił błąd podczas dodawania gry");
     }
   };
 
@@ -147,13 +155,16 @@ export default function AddGame({
         <div className="flex items-center gap-2 relative">
           <span className="w-40">Producent</span>
           <select
-            defaultValue="Pick a color"
+            defaultValue=""
+            required
             className="select select-sm rounded-md pl-3"
             disabled={pending}
             name="id_producenta"
             onChange={handleChange}
           >
-            <option disabled={true}>Producent</option>
+            <option value="" disabled={true}>
+              Producent
+            </option>
             {producers.map((producer) => (
               <option key={producer.id} value={producer.id}>
                 {producer.nazwa}
@@ -167,16 +178,20 @@ export default function AddGame({
             <FaInfoCircle className="opacity-50 cursor-pointer" />
           </div>
         </div>
+
         <div className="flex items-center gap-2 relative">
           <span className="w-40">Język</span>
           <select
-            defaultValue="Pick a color"
+            defaultValue=""
+            required
             className="select select-sm rounded-md pl-3"
             disabled={pending}
             name="id_jezyk"
             onChange={handleChange}
           >
-            <option disabled={true}>Język</option>
+            <option value="" disabled={true}>
+              Język
+            </option>
             {languages.map((language) => (
               <option key={language.id} value={language.id}>
                 {language.nazwa}
@@ -215,18 +230,31 @@ export default function AddGame({
             className="input input-sm"
           />
         </div>
-        <div className="flex items-center gap-2">
-          <span className="w-40">ID Rodzaj</span>
-          <input
+        <div className="flex items-center gap-2 relative">
+          <span className="w-40">Rodzaj</span>
+          <select
+            defaultValue=""
             required
-            type="number"
-            name="id_rodzaj"
-            maxLength={3}
-            placeholder="ID Rodzaj"
-            onChange={handleChange}
+            className="select select-sm rounded-md pl-3"
             disabled={pending}
-            className="input input-sm"
-          />
+            name="id_rodzaj"
+            onChange={handleChange}
+          >
+            <option value="" disabled={true}>
+              Rodzaj
+            </option>
+            {types.map((type) => (
+              <option key={type.id} value={type.id}>
+                {type.nazwa}
+              </option>
+            ))}
+          </select>
+          <div className="tooltip absolute top-0 -right-5">
+            <div className="tooltip-content">
+              <span>SELECT * FROM `RODZAJ`;</span>
+            </div>
+            <FaInfoCircle className="opacity-50 cursor-pointer" />
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <span className="w-40">Opis</span>
@@ -284,7 +312,6 @@ export default function AddGame({
           {pending && <FaSpinner className="animate-spin size-4" />}
           Dodaj grę
         </button>
-        {message && <p className="text-red-500 text-sm">{message}</p>}
       </form>
     </>
   );

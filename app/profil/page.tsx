@@ -10,6 +10,7 @@ import UpdateAccount from "./UpdateAccount";
 import AddGame from "./AddGame";
 import AddProducer from "./AddProducer";
 import AddLanguage from "./AddLanguage";
+import AddType from "./AddType";
 
 export default async function Profil() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -21,12 +22,13 @@ export default async function Profil() {
 
   const producers = await db.query.producent.findMany();
   const languages = await db.query.jezyk.findMany();
+  const types = await db.query.rodzaj.findMany();
 
   const sqlQuery = `SELECT \`id\`, \`id_konta\`, \`imie\`, \`email\`, \`nazwisko\`, \`telefon\`, \`miasto\`, \`kod_pocztowy\`, \`ulica\` 
       FROM \`KLIENT\` 
       WHERE \`KLIENT\`.\`id_konta\` = \'${session?.user.id}\';`;
   return (
-    <div className="flex flex-col items-start gap-2">
+    <div className="flex flex-col gap-2">
       <SqlView sql={sqlQuery} />
       <div className="flex flex-col">
         <h2 className="font-semibold text-2xl">Szczegóły konta:</h2>
@@ -61,9 +63,11 @@ export default async function Profil() {
             userId={session.user.id}
             producers={producers}
             languages={languages}
+            types={types}
           />
           <AddProducer />
           <AddLanguage />
+          <AddType />
         </>
       ) : null}
     </div>

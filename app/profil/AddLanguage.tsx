@@ -6,6 +6,7 @@ import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 import SqlView from "../_components/SqlView";
 import { FaSpinner } from "react-icons/fa6";
+import { useRouter } from "next/navigation";
 
 type AddLanguageType = {
   nazwa: string;
@@ -20,6 +21,7 @@ export default function AddLanguage() {
   const [sqlQuery, setSqlQuery] = useState("");
   const [pending, setPending] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const router = useRouter();
   const handleChange = (e: React.ChangeEvent<any>) => {
     const { name, value } = e.target;
     const escape = (v: string) => v.replace(/'/g, "''");
@@ -64,6 +66,7 @@ export default function AddLanguage() {
         skrot: formData.skrot || "",
       });
       setPending(false);
+      router.refresh();
       toast.success("Dodano język");
       formRef.current?.reset();
     } catch (error) {
@@ -128,7 +131,7 @@ export default function AddLanguage() {
         </div>
         <button className="btn btn-primary place-self-start" disabled={pending}>
           {pending && <FaSpinner className="animate-spin size-4" />}
-          Dodaj producenta
+          Dodaj język
         </button>
       </form>
     </>

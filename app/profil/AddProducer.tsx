@@ -8,6 +8,7 @@ import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 import SqlView from "../_components/SqlView";
 import { FaSpinner } from "react-icons/fa6";
+import { useRouter } from "next/navigation";
 
 export default function AddProducer() {
   const [formData, setFormData] = useState<Partial<AddProducerType> | null>(
@@ -16,6 +17,7 @@ export default function AddProducer() {
   const [sqlQuery, setSqlQuery] = useState("");
   const [pending, setPending] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const router = useRouter();
   const handleChange = (e: React.ChangeEvent<any>) => {
     const { name, value } = e.target;
     const escape = (v: string) => v.replace(/'/g, "''");
@@ -62,6 +64,7 @@ export default function AddProducer() {
       setPending(false);
       formRef.current?.reset();
       toast.success("Dodano producenta");
+      router.refresh();
     } catch (error) {
       setPending(false);
       toast.error("Wystąpił błąd podczas dodawania producenta");

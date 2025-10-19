@@ -3,9 +3,11 @@
 import fs from "fs/promises";
 import path from "path";
 import { randomBytes } from "crypto";
+import { log } from "console";
 
 export async function uploadImagesAction(formData: FormData) {
   const files = formData.getAll("images") as File[];
+
   if (!files || files.length === 0) {
     throw new Error("Brak przesłanych plików");
   }
@@ -18,7 +20,6 @@ export async function uploadImagesAction(formData: FormData) {
   const urls: string[] = [];
 
   for (const file of files) {
-    console.log("Uploading file:", file.name);
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
@@ -34,6 +35,6 @@ export async function uploadImagesAction(formData: FormData) {
     // URL względem public/
     urls.push(`/uploads/${fileName}`);
   }
-
+  console.log(urls);
   return urls;
 }
