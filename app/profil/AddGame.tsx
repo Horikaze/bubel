@@ -5,7 +5,7 @@ import SqlView from "../_components/SqlView";
 import { addGameAction } from "@/actions/addGameAction";
 import { jezyk, producent, rodzaj } from "@/db/schema";
 import toast from "react-hot-toast";
-import { FaInfo, FaSpinner } from "react-icons/fa6";
+import { FaInfo, FaSpinner, FaX } from "react-icons/fa6";
 import { FaInfoCircle } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { uploadImagesAction } from "@/actions/uploadImages";
@@ -33,6 +33,11 @@ type AddGameProps = {
   types: GameTypes[];
 };
 
+type ImageToSend = {
+  src: string;
+  file: File;
+};
+
 export default function AddGame({
   userId,
   producers,
@@ -44,6 +49,21 @@ export default function AddGame({
   const [pending, setPending] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
+  const [images, setImages] = useState<ImageToSend[]>([]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    const newImages = Array.from(files).map((file) => ({
+      src: URL.createObjectURL(file),
+      file,
+    }));
+
+    setImages((prev) => [...prev, ...newImages]);
+
+    return () => newImages.forEach((img) => URL.revokeObjectURL(img.src));
+  };
   const handleChange = (e: React.ChangeEvent<any>) => {
     const { name, value } = e.target;
 
@@ -89,18 +109,19 @@ export default function AddGame({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     try {
       e.preventDefault();
-      // setPending(true);
-      const imagesData = new FormData(e.currentTarget);
-      const images = await uploadImagesAction(imagesData);
+      setPending(true);
+      const imagesToSend = await uploadImagesAction(
+        images.map((img) => img.file)
+      );
       const data = new FormData();
       Object.entries(formData).forEach(([key, value]) =>
         data.append(key, value as string)
       );
-      data.append("zdjecia", images.join(","));
+      data.append("zdjecia", imagesToSend.join(","));
       await addGameAction(data);
       toast.success("Dodano producenta");
-      // formRef.current?.reset();
-      // router.refresh();
+      formRef.current?.reset();
+      router.refresh();
       setPending(false);
     } catch (error) {
       toast.error((error as Error).message);
@@ -121,9 +142,6 @@ export default function AddGame({
         className="flex flex-col gap-2"
       >
         <h2 className="font-semibold text-2xl">Dodaj grę</h2>
-        <p className="text-red-300 text-xs">
-          To jest sekcja dostępna tylko dla administratorów.
-        </p>
         <div className="flex items-center gap-2 mt-2">
           <span className="w-40">Tytuł</span>
           <input
@@ -152,7 +170,7 @@ export default function AddGame({
           />
         </div>
 
-        <div className="flex items-center gap-2 relative">
+        <div className="flex items-start gap-2">
           <span className="w-40">Producent</span>
           <select
             defaultValue=""
@@ -171,7 +189,7 @@ export default function AddGame({
               </option>
             ))}
           </select>
-          <div className="tooltip absolute top-0 -right-5">
+          <div className="tooltip">
             <div className="tooltip-content">
               <span>SELECT * FROM `PRODUCENT`;</span>
             </div>
@@ -179,7 +197,7 @@ export default function AddGame({
           </div>
         </div>
 
-        <div className="flex items-center gap-2 relative">
+        <div className="flex items-center gap-2">
           <span className="w-40">Język</span>
           <select
             defaultValue=""
@@ -198,7 +216,7 @@ export default function AddGame({
               </option>
             ))}
           </select>
-          <div className="tooltip absolute top-0 -right-5">
+          <div className="tooltip">
             <div className="tooltip-content">
               <span>SELECT * FROM `JEZYK`;</span>
             </div>
@@ -230,7 +248,7 @@ export default function AddGame({
             className="input input-sm"
           />
         </div>
-        <div className="flex items-center gap-2 relative">
+        <div className="flex items-center gap-2">
           <span className="w-40">Rodzaj</span>
           <select
             defaultValue=""
@@ -249,7 +267,7 @@ export default function AddGame({
               </option>
             ))}
           </select>
-          <div className="tooltip absolute top-0 -right-5">
+          <div className="tooltip">
             <div className="tooltip-content">
               <span>SELECT * FROM `RODZAJ`;</span>
             </div>
@@ -269,6 +287,30 @@ export default function AddGame({
             className="input input-sm"
           />
         </div>
+        {images.length > 0 && (
+          <div className="flex gap-2">
+            {images.map((src, i) => (
+              <div
+                key={i}
+                className="relative w-32 border rounded-lg overflow-hidden isolate"
+              >
+                <div
+                  onClick={() =>
+                    setImages((prev) => prev.filter((_, index) => index !== i))
+                  }
+                  className="top-0 right-0 size-6 grid place-items-center cursor-pointer absolute bg-secondary hover:brightness-125 rounded-full"
+                >
+                  <FaX />
+                </div>
+                <img
+                  src={src.src}
+                  alt={`Preview ${i}`}
+                  className="object-cover bg-white w-full h-full"
+                />
+              </div>
+            ))}
+          </div>
+        )}
         <div className="flex items-center gap-2">
           <span className="w-40">Zdjęcia</span>
           <input
@@ -277,7 +319,10 @@ export default function AddGame({
             multiple
             name="images"
             placeholder="Zdjęcia"
-            onChange={handleChange}
+            onChange={(e) => {
+              handleFileChange(e);
+              handleChange(e);
+            }}
             disabled={pending}
             className="input input-sm"
           />

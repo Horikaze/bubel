@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import React from "react";
 import { FaArrowRightToBracket, FaCartShopping, FaUser } from "react-icons/fa6";
+import ShowSqlSwitch from "./ShowSqlSwitch";
 
 export default async function NavBar() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -12,7 +13,11 @@ export default async function NavBar() {
       <Link href={"/"} className="btn btn-ghost text-xl">
         12311
       </Link>
-      <div className="flex gap-2">
+      <div className="flex gap-2 items-center">
+        <div className="flex gap-2">
+          SQL:
+          <ShowSqlSwitch />
+        </div>
         <div className="dropdown dropdown-end">
           <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
             <div className="indicator">

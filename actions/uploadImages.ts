@@ -5,9 +5,7 @@ import path from "path";
 import { randomBytes } from "crypto";
 import { log } from "console";
 
-export async function uploadImagesAction(formData: FormData) {
-  const files = formData.getAll("images") as File[];
-
+export async function uploadImagesAction(files: File[]) {
   if (!files || files.length === 0) {
     throw new Error("Brak przesłanych plików");
   }
