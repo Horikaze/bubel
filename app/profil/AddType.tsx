@@ -98,7 +98,7 @@ export default function AddType() {
           <textarea
             required
             name="opis"
-            maxLength={20}
+            maxLength={200}
             placeholder="Opis..."
             onChange={handleChange}
             disabled={pending}

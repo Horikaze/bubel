@@ -54,7 +54,9 @@ export default function AddProducer() {
         data.append(key, value)
       );
       const imagesData = new FormData(e.currentTarget);
-      const images = await uploadImagesAction(imagesData);
+      const images = await uploadImagesAction(
+        imagesData.getAll("images") as File[]
+      );
 
       const res = await addGameProducerAction({
         nazwa: formData.nazwa || "",
@@ -117,7 +119,6 @@ export default function AddProducer() {
             type="file"
             name="images"
             accept="image/*"
-            multiple
             placeholder="Język"
             onChange={handleChange}
             disabled={pending}

@@ -1,16 +1,32 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import {
+  Audiowide,
+  Geist,
+  Geist_Mono,
+  Orbitron,
+  Russo_One,
+} from "next/font/google";
+import { Toaster } from "react-hot-toast";
 import NavBar from "./_components/NavBar";
-import toast, { Toaster } from "react-hot-toast";
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+import "./globals.css";
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+// const myFont2 = Orbitron({
+//   subsets: ["latin"],
+//   weight: "400",
+// });
+// const myFont3 = Russo_One({
+//   subsets: ["latin"],
+//   weight: "400",
+// });
+const audiowide = Audiowide({
+  subsets: ["latin"],
+  weight: "400",
+  fallback: ["geist-mono", "monospace"],
 });
 
 export const metadata: Metadata = {
@@ -26,7 +42,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased max-w-7xl mx-auto px-1`}
+        className={` ${audiowide.className} antialiased max-w-7xl mx-auto px-1`}
       >
         <Toaster
           position="center-top"

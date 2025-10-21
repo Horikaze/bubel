@@ -119,7 +119,7 @@ export default function AddGame({
       );
       data.append("zdjecia", imagesToSend.join(","));
       await addGameAction(data);
-      toast.success("Dodano producenta");
+      toast.success("Dodano grę");
       formRef.current?.reset();
       router.refresh();
       setPending(false);
@@ -276,9 +276,8 @@ export default function AddGame({
         </div>
         <div className="flex items-center gap-2">
           <span className="w-40">Opis</span>
-          <input
+          <textarea
             required
-            type="text"
             name="opis"
             maxLength={300}
             placeholder="Opis"
