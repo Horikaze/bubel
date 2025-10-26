@@ -3,7 +3,6 @@
 import fs from "fs/promises";
 import path from "path";
 import { randomBytes } from "crypto";
-import { log } from "console";
 
 export async function uploadImagesAction(files: File[]) {
   if (!files || files.length === 0) {

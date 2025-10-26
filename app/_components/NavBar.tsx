@@ -5,6 +5,8 @@ import Link from "next/link";
 import React from "react";
 import { FaArrowRightToBracket, FaCartShopping, FaUser } from "react-icons/fa6";
 import ShowSqlSwitch from "./ShowSqlSwitch";
+import ThemeSwitcher from "./ThemeSwitcher";
+import CartItems from "./CartItems";
 
 export default async function NavBar() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -17,27 +19,9 @@ export default async function NavBar() {
         <div className="flex gap-2">
           SQL:
           <ShowSqlSwitch />
+          <ThemeSwitcher />
         </div>
-        <div className="dropdown dropdown-end">
-          <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
-            <div className="indicator">
-              <FaCartShopping className="size-6" />
-              <span className="badge badge-sm indicator-item">8</span>
-            </div>
-          </div>
-          <div
-            tabIndex={0}
-            className="card card-compact dropdown-content bg-base-100 z-1 mt-3 w-52 shadow"
-          >
-            <div className="card-body">
-              <span className="text-lg font-bold">8 Items</span>
-              <span className="text-info">Subtotal: $999</span>
-              <div className="card-actions">
-                <button className="btn btn-primary btn-block">View cart</button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <CartItems />
         {session ? (
           <div className="dropdown dropdown-end">
             <div

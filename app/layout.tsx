@@ -15,19 +15,19 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// const myFont2 = Orbitron({
-//   subsets: ["latin"],
-//   weight: "400",
-// });
-// const myFont3 = Russo_One({
-//   subsets: ["latin"],
-//   weight: "400",
-// });
-const audiowide = Audiowide({
+const myFont2 = Orbitron({
   subsets: ["latin"],
   weight: "400",
-  fallback: ["geist-mono", "monospace"],
 });
+const myFont3 = Russo_One({
+  subsets: ["latin"],
+  weight: "400",
+});
+// const audiowide = Audiowide({
+//   subsets: ["latin"],
+//   weight: "400",
+//   fallback: ["geist-mono", "monospace"],
+// });
 
 export const metadata: Metadata = {
   title: "Bubel",
@@ -42,7 +42,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={` ${audiowide.className} antialiased max-w-7xl mx-auto px-1`}
+        className={` ${geistMono.className} antialiased max-w-7xl mx-auto px-1`}
       >
         <Toaster
           position="center-top"

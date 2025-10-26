@@ -43,8 +43,7 @@ VALUES (DEFAULT, '${randomAlphaNumNode(10)}', '${updated.name}', '${
         updated.surname
       }', '${updated.email}', '${updated.phone}', '${updated.city}', '${
         updated.zip
-      }', '${updated.street}');
-`);
+      }', '${updated.street}');`);
 
       return updated;
     });

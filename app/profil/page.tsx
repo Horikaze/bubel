@@ -1,7 +1,4 @@
-import { db } from "@/db/drizzle";
-import { klient } from "@/db/schema";
 import { auth } from "@/lib/auth";
-import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import React from "react";
@@ -12,18 +9,21 @@ import AddProducer from "./AddProducer";
 import AddLanguage from "./AddLanguage";
 import AddType from "./AddType";
 import { FaGamepad, FaLanguage, FaSpaceAwesome, FaUser } from "react-icons/fa6";
+import db from "@/lib/prisma";
 
 export default async function Profil() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/login");
-  const userData = await db.query.klient.findFirst({
-    where: eq(klient.id_konta, session?.user.id),
+  const userData = await db.klient.findFirst({
+    where: {
+      id: session.user.id,
+    },
   });
   if (!userData) redirect("/login");
 
-  const producers = await db.query.producent.findMany();
-  const languages = await db.query.jezyk.findMany();
-  const types = await db.query.rodzaj.findMany();
+  const producers = await db.producent.findMany();
+  const languages = await db.jezyk.findMany();
+  const types = await db.rodzaj.findMany();
 
   const sqlQuery = `SELECT \`id\`, \`id_konta\`, \`imie\`, \`email\`, \`nazwisko\`, \`telefon\`, \`miasto\`, \`kod_pocztowy\`, \`ulica\` 
       FROM \`KLIENT\` 
@@ -35,7 +35,6 @@ export default async function Profil() {
         <h2 className="font-semibold text-2xl">Szczegóły konta:</h2>
         <div className="flex flex-col gap-1">
           <p>ID użytkownika: {userData.id}</p>
-          <p>ID konta: {session?.user.id}</p>
           <p>Imię: {userData.imie}</p>
           <p>Nazwisko: {userData.nazwisko || "Nie podano"}</p>
           <p>Email: {userData.email || "Nie podano"}</p>
@@ -56,7 +55,7 @@ export default async function Profil() {
           email: userData.email || "",
           password: "",
         }}
-        userId={userData.id_konta}
+        userId={userData.id}
       />
       {session.user.role == "admin" ? (
         <>

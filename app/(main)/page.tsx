@@ -5,7 +5,9 @@ import GamesList from "./GamesList";
 
 export default async function Home() {
   const session = await auth.api.getSession({ headers: await headers() });
-  const sqlQueryAllGames = `SELECT \`id\`, \`nazwa\`, \`cena\`, \`ocena\` FROM \`GRA\`;`;
+  const sqlQueryAllGames = `SELECT * FROM \`GRA\`
+  LEFT JOIN \`JEZYK\` ON \`GRA\`.\`id_jezyk\` = \`JEZYK\`.\`id\`;`;
+
   return (
     <div className="flex flex-col">
       {session && (

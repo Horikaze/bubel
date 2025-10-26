@@ -58,7 +58,9 @@ export default function AddLanguage() {
         data.append(key, value)
       );
       const imagesData = new FormData(e.currentTarget);
-      const images = await uploadImagesAction(imagesData.getAll("images") as File[]);
+      const images = await uploadImagesAction(
+        imagesData.getAll("images") as File[]
+      );
 
       const res = await addLanguage({
         nazwa: formData.nazwa || "",

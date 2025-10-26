@@ -1,8 +1,7 @@
-import { db } from "@/db/drizzle";
 import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
-import * as schema from "@/db/schema";
+import db from "./prisma";
 export const auth = betterAuth({
   user: {
     additionalFields: {
@@ -13,10 +12,14 @@ export const auth = betterAuth({
         defaultValue: "user",
       },
     },
+    fields: {
+      name: "imie",
+      image: "zdjecie",
+    },
+    modelName: "klient",
   },
-  database: drizzleAdapter(db, {
+  database: prismaAdapter(db, {
     provider: "mysql",
-    schema: schema,
   }),
   plugins: [nextCookies()],
   emailAndPassword: {

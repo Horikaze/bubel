@@ -1,9 +1,6 @@
 "use server";
-
-import { db } from "@/db/drizzle";
-import { klient } from "@/db/schema";
 import { auth } from "@/lib/auth";
-import { sql } from "drizzle-orm";
+import db from "@/lib/prisma";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -29,16 +26,18 @@ export const singUpAction = async (formData: FormData) => {
       name,
     },
   });
-  await db.insert(klient).values({
-    id_konta: user.user.id,
-    imie: user.user.name || "",
-    nazwisko: nazwisko || "",
-    email: email || "",
-    telefon: phone || "",
-    kod_pocztowy: zip || "",
-    miasto: city || "",
-    ulica: street || "",
+  db.klient.update({
+    where: { id: user.user.id },
+    data: {
+      nazwisko: nazwisko || "",
+      telefon: phone || "",
+      email: email,
+      kod_pocztowy: zip || "",
+      miasto: city || "",
+      ulica: street || "",
+    },
   });
+
   return { status: true };
 };
 

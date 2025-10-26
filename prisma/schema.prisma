@@ -1,0 +1,174 @@
+// schema.prisma
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+// PRODUCENT
+model Producent {
+    id    Int     @id @default(autoincrement())
+    nazwa String  @db.VarChar(50)
+    logo  String? @db.VarChar(100)
+    opis  String? @db.VarChar(500)
+    Gry   Gra[]
+}
+
+// JEZYK
+model Jezyk {
+    id    Int     @id @default(autoincrement())
+    nazwa String  @db.VarChar(30)
+    flaga String? @db.VarChar(100)
+    skrot String? @db.VarChar(10)
+    Gry   Gra[]
+}
+
+// RODZAJ
+model Rodzaj {
+    id    Int     @id @default(autoincrement())
+    nazwa String  @db.VarChar(30)
+    opis  String?
+    Gry   Gra[]
+}
+
+// GRA
+model Gra {
+    id            Int        @id @default(autoincrement())
+    nazwa         String     @db.VarChar(50)
+    id_producenta Int?
+    Producent     Producent? @relation(fields: [id_producenta], references: [id], onDelete: SetNull, onUpdate: Cascade)
+    cena          Decimal?   @db.Decimal(10, 2)
+    id_jezyk      Int?
+    Jezyk         Jezyk?     @relation(fields: [id_jezyk], references: [id], onDelete: SetNull, onUpdate: Cascade)
+    data_wydania  DateTime?
+    od_ilu_lat    Int?
+    id_rodzaj     Int?
+    Rodzaj        Rodzaj?    @relation(fields: [id_rodzaj], references: [id], onDelete: SetNull, onUpdate: Cascade)
+    opis          String?    @db.VarChar(2000)
+    zdjecia       String?    @db.VarChar(500)
+    ocena         Decimal?   @db.Decimal(3, 1)
+    dostepnosc    Int        @default(0)
+
+    Komentarz     Komentarz[]
+    TranzakcjaGra TranzakcjaGra[]
+}
+
+enum Role {
+    user
+    admin
+}
+
+// KLIENT
+model Klient {
+    id            String   @id @db.VarChar(32)
+    imie          String   @db.VarChar(30)
+    email         String   @unique @db.VarChar(255)
+    nazwisko      String?  @db.VarChar(30)
+    telefon       String?  @db.VarChar(20)
+    miasto        String?  @db.VarChar(40)
+    kod_pocztowy  String?  @db.VarChar(10)
+    ulica         String?  @db.VarChar(50)
+    zdjecie       String?
+    role          Role     @default(user)
+    emailVerified Boolean  @default(false)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+
+    Tranzakcje Tranzakcja[]
+    Komentarze Komentarz[]
+    Sessions   Session[]
+    Accounts   Account[]
+}
+
+// METODA_PLATNOSCI
+model MetodaPlatnosci {
+    id         Int          @id @default(autoincrement())
+    nazwa      String       @db.VarChar(30)
+    Tranzakcje Tranzakcja[]
+}
+
+// TRANZAKCJA
+model Tranzakcja {
+    id                  Int              @id @default(autoincrement())
+    id_klienta          String
+    Klient              Klient           @relation(fields: [id_klienta], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    data_tranzakcji     DateTime         @default(now())
+    id_metody_platnosci Int?
+    MetodaPlatnosci     MetodaPlatnosci? @relation(fields: [id_metody_platnosci], references: [id], onDelete: SetNull, onUpdate: Cascade)
+    czy_online          Boolean          @default(true)
+    status              Int              @default(0)
+
+    Gry TranzakcjaGra[]
+}
+
+// TRANZAKCJA_GRA (tabela pośrednicząca)
+model TranzakcjaGra {
+    id_tranzakcji Int
+    Tranzakcja    Tranzakcja @relation(fields: [id_tranzakcji], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    id_gra        Int
+    Gra           Gra        @relation(fields: [id_gra], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    ilosc         Int        @default(1)
+
+    @@id([id_tranzakcji, id_gra])
+    @@index([id_tranzakcji])
+    @@index([id_gra])
+}
+
+// SESSION
+model Session {
+    id        String   @id @db.VarChar(36)
+    expiresAt DateTime
+    token     String   @unique @db.VarChar(255)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    ipAddress String?
+    userAgent String?
+    userId    String
+    Klient    Klient   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// KOMENTARZ
+model Komentarz {
+    id           Int      @id @default(autoincrement())
+    id_klienta   String
+    Klient       Klient   @relation(fields: [id_klienta], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    id_gry       Int
+    Gra          Gra      @relation(fields: [id_gry], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    tresc        String
+    ocena        Decimal  @db.Decimal(3, 1)
+    data_dodania DateTime @default(now())
+
+    @@unique([id_klienta, id_gry])
+}
+
+// ACCOUNT
+model Account {
+    id                    String    @id @db.VarChar(36)
+    accountId             String
+    providerId            String
+    userId                String
+    Klient                Klient    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    accessToken           String?
+    refreshToken          String?
+    idToken               String?
+    accessTokenExpiresAt  DateTime?
+    refreshTokenExpiresAt DateTime  @default(now())
+    scope                 String?
+    password              String?
+    createdAt             DateTime  @default(now())
+    updatedAt             DateTime  @updatedAt
+}
+
+// VERIFICATION
+model Verification {
+    id         String   @id @db.VarChar(36)
+    identifier String
+    value      String
+    expiresAt  DateTime
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+}

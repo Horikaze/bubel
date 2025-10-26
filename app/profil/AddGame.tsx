@@ -1,14 +1,14 @@
 "use client";
 
-import { useRef, useState } from "react";
-import SqlView from "../_components/SqlView";
 import { addGameAction } from "@/actions/addGameAction";
-import { jezyk, producent, rodzaj } from "@/db/schema";
-import toast from "react-hot-toast";
-import { FaInfo, FaSpinner, FaX } from "react-icons/fa6";
-import { FaInfoCircle } from "react-icons/fa";
-import { useRouter } from "next/navigation";
 import { uploadImagesAction } from "@/actions/uploadImages";
+import { Jezyk, Producent, Rodzaj } from "@prisma/client";
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
+import toast from "react-hot-toast";
+import { FaInfoCircle } from "react-icons/fa";
+import { FaSpinner, FaX } from "react-icons/fa6";
+import SqlView from "../_components/SqlView";
 
 type Gra = {
   nazwa: string | null;
@@ -23,14 +23,11 @@ type Gra = {
   ocena: string | null;
   dostepnosc: string | null;
 };
-type Producers = typeof producent.$inferSelect;
-type Languages = typeof jezyk.$inferSelect;
-type GameTypes = typeof rodzaj.$inferSelect;
 type AddGameProps = {
   userId: string;
-  producers: Producers[];
-  languages: Languages[];
-  types: GameTypes[];
+  producers: Producent[];
+  languages: Jezyk[];
+  types: Rodzaj[];
 };
 
 type ImageToSend = {

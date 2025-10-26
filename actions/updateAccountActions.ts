@@ -1,12 +1,7 @@
 "use server";
-
-import { db } from "@/db/drizzle";
-import { klient } from "@/db/schema";
 import { auth } from "@/lib/auth";
-import { log } from "console";
-import { eq, sql } from "drizzle-orm";
+import db from "@/lib/prisma";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 export const updateAccountAction = async (formData: FormData) => {
   try {
@@ -28,17 +23,18 @@ export const updateAccountAction = async (formData: FormData) => {
       },
       headers: hdrs,
     });
-    await db
-      .update(klient)
-      .set({
+
+    await db.klient.update({
+      where: { id: session.user.id },
+      data: {
         imie: name,
         nazwisko: nazwisko || "",
         telefon: phone || "",
         kod_pocztowy: zip || "",
         miasto: city || "",
         ulica: street || "",
-      })
-      .where(eq(klient.id_konta, session.user.id));
+      },
+    });
     return { message: "", status: true };
   } catch (error: any) {
     console.log(error);

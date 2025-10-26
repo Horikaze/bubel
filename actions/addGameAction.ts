@@ -1,12 +1,9 @@
 "use server";
 
-import { db } from "@/db/drizzle";
-import { gra, jezyk, klient, producent, rodzaj } from "@/db/schema";
 import { auth } from "@/lib/auth";
-import { log } from "console";
-import { eq, sql } from "drizzle-orm";
+import db from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 export const addGameAction = async (formData: FormData) => {
   const hdrs = await headers();
@@ -39,21 +36,22 @@ export const addGameAction = async (formData: FormData) => {
   ) {
     throw new Error("Popraw swoje dane");
   }
-  await db.insert(gra).values({
-    nazwa,
-    cena,
-    id_producenta,
-    id_jezyk,
-    data_wydania: new Date(data_wydania),
-    id_rodzaj,
-    opis,
-    zdjecia,
-    ocena,
-    dostepnosc,
-    od_ilu_lat,
+  await db.gra.create({
+    data: {
+      nazwa,
+      cena: new Prisma.Decimal(cena),
+      id_producenta,
+      id_jezyk,
+      data_wydania: new Date(data_wydania),
+      od_ilu_lat,
+      id_rodzaj,
+      opis,
+      zdjecia,
+      ocena,
+      dostepnosc,
+    },
   });
 };
-
 export type AddProducerType = {
   nazwa: string;
   images: string;
@@ -65,9 +63,12 @@ export const addGameProducerAction = async (producer: AddProducerType) => {
   const session = await auth.api.getSession({ headers: hdrs });
   if (!session) throw new Error("Nieautoryzowany");
   if (!producer) throw new Error("Brak danych producenta");
-  await db.insert(producent).values({
-    ...producer,
-    logo: producer.images,
+  await db.producent.create({
+    data: {
+      nazwa: producer.nazwa,
+      logo: producer.images,
+      opis: producer.opis,
+    },
   });
 };
 
@@ -82,9 +83,12 @@ export const addLanguage = async (languaage: AddLanguageType) => {
   const session = await auth.api.getSession({ headers: hdrs });
   if (!session) throw new Error("Nieautoryzowany");
   if (!languaage) throw new Error("Brak danych języku");
-  await db.insert(jezyk).values({
-    ...languaage,
-    flaga: languaage.images,
+  await db.jezyk.create({
+    data: {
+      nazwa: languaage.nazwa,
+      flaga: languaage.images,
+      skrot: languaage.skrot,
+    },
   });
 };
 
@@ -98,7 +102,10 @@ export const addGameType = async (gameType: AddGameTypeType) => {
   const session = await auth.api.getSession({ headers: hdrs });
   if (!session) throw new Error("Nieautoryzowany");
   if (!gameType) throw new Error("Brak danych języku");
-  await db.insert(rodzaj).values({
-    ...gameType,
+  await db.rodzaj.create({
+    data: {
+      nazwa: gameType.nazwa,
+      opis: gameType.opis,
+    },
   });
 };
