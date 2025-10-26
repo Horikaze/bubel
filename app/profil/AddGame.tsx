@@ -1,6 +1,6 @@
 "use client";
 
-import { addGameAction } from "@/actions/addGameAction";
+import { addGameAction } from "@/actions/gameAction";
 import { uploadImagesAction } from "@/actions/uploadImages";
 import { Jezyk, Producent, Rodzaj } from "@prisma/client";
 import { useRouter } from "next/navigation";

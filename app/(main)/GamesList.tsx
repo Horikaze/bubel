@@ -16,7 +16,7 @@ export default async function GamesList() {
         <Link
           href={`gra/${g.id}`}
           key={g.id}
-          className="bg-accent h-72 w-52  rounded-box overflow-hidden group relative"
+          className="bg-accent h-72 w-52  rounded-box overflow-hidden group relative text-white"
         >
           {g.zdjecia && (
             <Image

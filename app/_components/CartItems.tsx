@@ -82,7 +82,7 @@ export default function CartItems() {
           </span>
           <span className="text-info">Cena całkowita: {totalPriceC}</span>
           <div className="card-actions">
-            <Link href={"/kasa"} className="btn w-full">
+            <Link href={"/kasa"} className="btn w-full btn-primary">
               Do kasy
             </Link>
           </div>

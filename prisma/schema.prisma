@@ -99,10 +99,9 @@ model Tranzakcja {
     data_tranzakcji     DateTime         @default(now())
     id_metody_platnosci Int?
     MetodaPlatnosci     MetodaPlatnosci? @relation(fields: [id_metody_platnosci], references: [id], onDelete: SetNull, onUpdate: Cascade)
-    czy_online          Boolean          @default(true)
     status              Int              @default(0)
-
-    Gry TranzakcjaGra[]
+    kwota               Decimal          @default(0.00) @db.Decimal(10, 2)
+    Gry                 TranzakcjaGra[]
 }
 
 // TRANZAKCJA_GRA (tabela pośrednicząca)

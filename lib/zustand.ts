@@ -6,7 +6,7 @@ type ShowSqlStore = {
   setSql: (value: boolean) => void;
 };
 
-type CartItem = {
+export type CartItem = {
   gameId: number;
   gameName: string;
   price: number;

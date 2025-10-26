@@ -43,7 +43,7 @@ export default function UpdateAccount({
       if (parts.length > 0) {
         const query = `UPDATE \`KLIENT\` SET
   ${parts.join(",\n  ")}
-WHERE \`KLIENT\`.\`id_konta\` = '${escape(String(userID))}';`;
+WHERE \`KLIENT\`.\`id\` = '${escape(String(userID))}';`;
         setSqlQuery(query);
       } else {
         setSqlQuery("");

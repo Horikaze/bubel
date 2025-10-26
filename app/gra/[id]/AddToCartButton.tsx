@@ -1,6 +1,7 @@
 "use client";
 import { useCart } from "@/lib/zustand";
 import React from "react";
+import toast from "react-hot-toast";
 import { FaShoppingCart } from "react-icons/fa";
 
 type AddToCartButtonProps = {
@@ -18,7 +19,10 @@ export default function AddToCartButton({
 
   return (
     <button
-      onClick={() => addItem({ gameId, gameName, price })}
+      onClick={() => {
+        addItem({ gameId, gameName, price });
+        toast.success(`${gameName} dodane do koszyka!`);
+      }}
       className="btn btn-accent btn-wide"
     >
       <FaShoppingCart /> Dodaj do koszyka

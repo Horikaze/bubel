@@ -13,7 +13,7 @@ export default async function NavBar() {
   return (
     <nav className="navbar bg-base-100 shadow-sm flex justify-between">
       <Link href={"/"} className="btn btn-ghost text-xl">
-        12311
+        Bubel
       </Link>
       <div className="flex gap-2 items-center">
         <div className="flex gap-2">

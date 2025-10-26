@@ -2,7 +2,7 @@
 import {
   addGameProducerAction,
   AddProducerType,
-} from "@/actions/addGameAction";
+} from "@/actions/gameAction";
 import { uploadImagesAction } from "@/actions/uploadImages";
 import { useRef, useState } from "react";
 import toast from "react-hot-toast";

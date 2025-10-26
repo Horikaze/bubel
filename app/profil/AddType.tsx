@@ -1,6 +1,6 @@
 "use client";
 
-import { addGameType } from "@/actions/addGameAction";
+import { addGameType } from "@/actions/gameAction";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import toast from "react-hot-toast";
